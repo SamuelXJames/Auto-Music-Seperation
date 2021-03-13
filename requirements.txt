@@ -1,0 +1,3 @@
+#Example Format Requirments File
+#check-requirements-txt
+#git+git://github.com/tarepan/rainbowgram.git
