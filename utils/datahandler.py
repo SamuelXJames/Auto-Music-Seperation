@@ -87,12 +87,12 @@ class dataHandler:
     return dataset
 
 #EXAMPLE
-dh = dataHandler()
-files = dh.listFiles('', partion=3)
-for partion in files:
-  ds = dh.build_dataset(partition, 32)
-  for (HR,HR_label,LR,LR_label) in ds.take(-1):
-      print('HR Shape: ' + str(np.shape(HR)) + ' LR Shape: ' + str(np.shape(LR)))
+# dh = dataHandler()
+# files = dh.listFiles('', partion=3)
+# for partion in files:
+#   ds = dh.build_dataset(partition, 32)
+#   for (HR,HR_label,LR,LR_label) in ds.take(-1):
+#       print('HR Shape: ' + str(np.shape(HR)) + ' LR Shape: ' + str(np.shape(LR)))
 
 #Different Methods to get batch
 # ds = ds.cache() #if aplicable
