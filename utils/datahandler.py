@@ -65,6 +65,7 @@ class dataHandler:
     
     return HR,HR_label,LR,LR_label
   
+  @tf.function
   def build_dataset(self,dataset, batch_size):
     ignore_order = tf.data.Options()
     ignore_order.experimental_deterministic = False
