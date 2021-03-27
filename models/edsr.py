@@ -16,7 +16,7 @@ def res_block(input_tensor, filters, scale=0.1):
 
 
 def sub_pixel_conv2d(scale=2, **kwargs):
-    return Lambda(lambda x: tf.depth_to_space(x, scale), **kwargs)
+    return Lambda(lambda x: tf.nn.depth_to_space(x, scale), **kwargs)
 
 
 def upsample(input_tensor, filters):
