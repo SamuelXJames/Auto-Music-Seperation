@@ -24,7 +24,7 @@ class dataHandler:
     files = tf.data.Dataset.list_files(os.path.join(tfr_dir,'*.tfrec'))
     
     if partion:
-      files = files.batch(partion)
+      files = files.batch(partition)
       files = list(files.as_numpy_iterator())
   
     return files
