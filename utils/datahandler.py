@@ -63,9 +63,9 @@ class dataHandler:
     HR_label = example['HR_label']
     LR_label = example['LR_label']
     
-    return HR,HR_label,LR,LR_label
+    return LR,HR,LR_label,HR_label
   
-  
+  #@tf.function
   def build_dataset(self,dataset, batch_size):
     ignore_order = tf.data.Options()
     ignore_order.experimental_deterministic = False
@@ -89,10 +89,10 @@ class dataHandler:
 
 #EXAMPLE
 # dh = dataHandler()
-# files = dh.listFiles('', partion=3)
+# files = dh.listFiles('')
 # for partion in files:
 #   ds = dh.build_dataset(partition, 32)
-#   for (HR,HR_label,LR,LR_label) in ds.take(-1):
+#   for (LR,HR,LR_label,HR_label) in ds.take(-1):
 #       print('HR Shape: ' + str(np.shape(HR)) + ' LR Shape: ' + str(np.shape(LR)))
 
 #Different Methods to get batch
