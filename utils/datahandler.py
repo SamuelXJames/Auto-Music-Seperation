@@ -20,7 +20,7 @@ class dataHandler:
     return None
   
   
-  def listFiles(self,tfr_dir,partion = None):
+  def listFiles(self,tfr_dir,partition = None):
     files = tf.data.Dataset.list_files(os.path.join(tfr_dir,'*.tfrec'))
     
     if partion:
