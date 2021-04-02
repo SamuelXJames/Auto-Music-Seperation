@@ -84,6 +84,7 @@ class dataHandler:
   
     dataset = dataset.map(self.read_tfrecord,num_parallel_calls = tf.data.AUTOTUNE)
     
+    dataset = dataset.shuffle(buffer_size=2048)
     dataset = dataset.repeat()
     dataset = dataset.prefetch(buffer_size=tf.data.AUTOTUNE)
     return dataset
