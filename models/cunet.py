@@ -108,7 +108,7 @@ def u_net_deconv_block(
 
 
 def cunet_model():
-    inputs = Input(shape=[None,None,1])
+    inputs = Input(shape=config.INPUT_SHAPE)
     n_layers = config.N_LAYERS
     x = inputs
     encoder_layers = []
