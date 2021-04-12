@@ -48,7 +48,7 @@ class config(Config):
     AUG = True
 
     # unet paramters
-    INPUT_SHAPE = [None, None, 1]  # freq = 512, time = 128
+    #INPUT_SHAPE = [None, None, 1]  # freq = 512, time = 128
     FILTERS_LAYER_1 = 16
     N_LAYERS = 6
     LR = 1e-3
