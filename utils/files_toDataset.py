@@ -16,10 +16,10 @@ def getPredictFiles(folder_path, extension = '*.wav'):
   dataset = tf.data.Dataset.from_tensor_slices(files)
   
   if extension == '*.wav':
-    dataset = files.map(WAV_to_Dataset)
+    dataset = dataset.map(WAV_to_Dataset)
   
   else:
-    dataset = files.map(PNG_to_Dataset)
+    dataset = dataset.map(PNG_to_Dataset)
   
   dataset = dataset.batch(np.shape(files)[0])
   return dataset, files
