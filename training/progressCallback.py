@@ -16,7 +16,7 @@ class CheckProgressCallback(keras.callbacks.Callback):
 
   def __init__(self,freq = 5):
     super(CheckProgressCallback, self).__init__()
-    self.freq = 5
+    self.freq = freq
   
   def on_epoch_end(self, epoch, logs = None):
     if epoch % self.freq == 0:
