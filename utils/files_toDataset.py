@@ -36,5 +36,4 @@ def WAV_to_Dataset(file):
 
   return image
 
-import numpy as np
-np.shape([1,2,3])[0]
+
