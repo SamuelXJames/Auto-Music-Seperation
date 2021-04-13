@@ -21,7 +21,7 @@ def getPredictFiles(folder_path, extension = '*.wav'):
   else:
     dataset = dataset.map(PNG_to_Dataset)
   
-  dataset = dataset.batch(np.shape(files)[0])
+  dataset = dataset.batch(1)
   return dataset, files
 
 
