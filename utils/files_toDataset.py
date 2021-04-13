@@ -12,7 +12,7 @@ import tensorflow as tf
 
 def getPredictFiles(folder_path, extension = '*.wav'):
 
-  files = tf.io.gfile.glob(folder_path + img_format)
+  files = tf.io.gfile.glob(folder_path + extension)
   dataset = tf.data.Dataset.from_tensor_slices(files)
   
   if extension == '*.wav':
