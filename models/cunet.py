@@ -12,10 +12,11 @@ import tensorflow as tf
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import (
     Input, Conv2D, multiply, BatchNormalization, Conv1D, Dropout, Lambda,
-    Concatenate, Conv2DTranspose, Dense, LeakyReLU)
+    Concatenate, Conv2DTranspose, Dense, LeakyReLU,ZeroPadding2D,Cropping2D)
 from tensorflow.keras.optimizers import Adam
-from models.CUNET_config import config
-
+import numpy as np
+#from models.CUNET_config import config
+#from config import config
 
 def FiLM_simple_layer():
     """multiply scalar to a tensor"""
@@ -57,7 +58,7 @@ def cnn_control(n_conditions, n_filters):
         - n_conditions = 1008
         - n_filters = [16, 32, 64]
     """
-    input_conditions = Input(shape=(config.Z_DIM, 1))
+    input_conditions = Input(shape=(config.Z_DIM, 1), name = 'Film Input')
     initializer = tf.random_normal_initializer(stddev=0.02)
     cnn = cnn_block(
         input_conditions, n_filters, config.Z_DIM, config.PADDING, initializer
@@ -106,11 +107,23 @@ def u_net_deconv_block(
     x = get_activation(activation)(x)
     return x
 
+def getPaddingShape(input_shape):
+  output_shape = [input]
+  ax1 = (2**np.ceil(np.log2(input_shape[0]))) - input_shape[0]
+  a = int(np.floor(ax1/2))
+  b = int(np.ceil(ax1/2))
 
-def cunet_model():
-    inputs = Input(shape=config.INPUT_SHAPE)
+  ax2 = (2**np.ceil(np.log2(input_shape[1]))) - input_shape[1]
+  c = int(np.floor(ax2/2))
+  d = int(np.ceil(ax2/2))
+  return a,b,c,d
+
+def cunet_model(shape = (334,217,1)):
+    inputs = Input(shape=shape)#[512,128,1]
     n_layers = config.N_LAYERS
+    a,b,c,d = getPaddingShape(input_shape = shape)
     x = inputs
+    x = ZeroPadding2D(((a,b),(c,d)))(x)
     encoder_layers = []
     initializer = tf.random_normal_initializer(stddev=0.02)
 
@@ -145,6 +158,7 @@ def cunet_model():
         x = u_net_deconv_block(
             x, encoder_layer, n_filters, initializer, activation, dropout, skip
         )
+    x = Cropping2D(((a,b), (c,d)))(x)
     outputs = multiply([inputs, x])
     model = Model(inputs=[inputs, input_conditions], outputs=outputs)
     return model
