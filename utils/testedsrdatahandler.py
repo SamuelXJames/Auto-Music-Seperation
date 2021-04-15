@@ -140,24 +140,13 @@ class dataHandler:
 #       print('HR Shape: ' + str(np.shape(HR)) + ' LR Shape: ' + str(np.shape(LR)))
 
 #EXAMPLE
-dh = dataHandler()
-files = dh.listFiles('gs://super_res_train/TFRecords/edsr_data/')
-ds = dh.build_dataset(files, 1)
-for (a,(b,c,d,e)) in ds.take(10):
-  print('{},{},{},{},{}'.format(np.shape(a),
-                                np.shape(b),
-                                np.shape(c),
-                                np.shape(d),
-                                np.shape(e)))
+#dh = dataHandler()
+#files = dh.listFiles('gs://super_res_train/TFRecords/edsr_data/')
+#ds = dh.build_dataset(files, 1)
+#for (a,(b,c,d,e)) in ds.take(10):
+#  print('{},{},{},{},{}'.format(np.shape(a),
+#                                np.shape(b),
+#                                np.shape(c),
+#                                np.shape(d),
+#                                np.shape(e)))
 
-p## IGNORE if storing kerenels locally or on Google Drive
-#Authenticare access to cloud storage
-!gcloud auth login
-
-#Set current GCS project
-!gcloud config set project superres000
-
-## IGNORE if storing kerenels locally or on Google Drive
-#Setup google cloud sdk (seems to be necessary but could be redudant)
-from google.colab import auth
-auth.authenticate_user()
