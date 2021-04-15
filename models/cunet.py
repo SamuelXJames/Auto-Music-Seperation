@@ -15,8 +15,7 @@ from tensorflow.keras.layers import (
     Concatenate, Conv2DTranspose, Dense, LeakyReLU,ZeroPadding2D,Cropping2D)
 from tensorflow.keras.optimizers import Adam
 import numpy as np
-#from models.CUNET_config import config
-from CUNET_config import config
+from models.CUNET_config import config
 
 def FiLM_simple_layer():
     """multiply scalar to a tensor"""
