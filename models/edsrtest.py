@@ -59,5 +59,3 @@ def generator(shape = (715,715,1)):
   model = Model(inputs=inputs, outputs= bass)
   return model
 
-model = generator()
-model.summary()
