@@ -52,8 +52,8 @@ def generator_block(inputs,filters=128, n_id_block=16, n_sub_block=1):
     x = Conv2D(filters=1, kernel_size=3, strides=1, padding='same')(x)
     
     return x
-def generator(shape = (715,715,1)):
-  inputs = Input(shape)
+def generator(input_shape = (None,None,1)):
+  inputs = Input(shape = input_shape)
   bass = generator_block(inputs)
   
   model = Model(inputs=inputs, outputs= bass)
