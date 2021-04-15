@@ -105,7 +105,7 @@ class dataHandler:
 
     
     
-    return Mixdown, Label, Instrument
+    return (Mixdown, Label), Instrument
   
   #@tf.function
   def build_dataset(self,dataset, batch_size):
