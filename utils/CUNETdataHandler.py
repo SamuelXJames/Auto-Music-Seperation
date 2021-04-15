@@ -35,7 +35,7 @@ class dataHandler:
     self.NUM_IMAGES = int(GCS_File[GCS_File.find('N')+1:GCS_File.rfind('_')])
     w = int(GCS_File[GCS_File.find('W')+1:GCS_File.rfind('H')])
     h = int(GCS_File[GCS_File.find('H')+1:GCS_File.rfind('N')])
-    self.IMG_SHAPE = [w,h] 
+    self.IMG_SHAPE = (w,h,1) 
     self.NUM_CHANNELS = 1
 
   
