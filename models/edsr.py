@@ -52,7 +52,7 @@ def generator_block(inputs,filters=128, n_id_block=16, n_sub_block=1):
     x = Conv2D(filters=1, kernel_size=3, strides=1, padding='same')(x)
     
     return x
-def generator(shape = (84,84,1)):
+def generator(shape = (None,None,1)):
   inputs = Input(shape)
   bass = generator_block(inputs)
   drums = generator_block(inputs)
