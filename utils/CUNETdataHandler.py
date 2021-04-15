@@ -125,7 +125,7 @@ class dataHandler:
     dataset = dataset.batch(batch_size, drop_remainder = False)
   
     dataset = dataset.map(self.read_tfrecord,num_parallel_calls = tf.data.AUTOTUNE)
-    #dataset = dataset.map(self.scaleData)
+    dataset = dataset.repeat()
     dataset = dataset.prefetch(buffer_size=tf.data.AUTOTUNE)
     return dataset
 
