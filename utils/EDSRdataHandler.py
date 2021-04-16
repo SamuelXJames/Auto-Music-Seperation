@@ -22,9 +22,9 @@ class dataHandler:
   
   def listFiles(self,tfr_dir,partition = None):
     files = tf.data.Dataset.list_files(os.path.join(tfr_dir,'*.tfrec'))
-    
     sample_file = tf.io.gfile.glob(os.path.join(tfr_dir,'*.tfrec'))[0]
     self.getFileInfo(sample_file)
+    files = files.shuffle(buffer_size=self.NUM_IMAGES)
     if partition:
       files = files.batch(partition)
       files = list(files.as_numpy_iterator())
@@ -138,3 +138,14 @@ class dataHandler:
 #   ds = dh.build_dataset(partition, 32)
 #   for (LR,HR,LR_label,HR_label) in ds.take(-1):
 #       print('HR Shape: ' + str(np.shape(HR)) + ' LR Shape: ' + str(np.shape(LR)))
+
+# #EXAMPLE
+# dh = dataHandler()
+# files = dh.listFiles('/content/')
+# ds = dh.build_dataset(files, 1)
+# for (a,(b,c,d,e)) in ds.take(10):
+#   print('{},{},{},{},{}'.format(np.shape(a),
+#                                 np.shape(b),
+#                                 np.shape(c),
+#                                 np.shape(d),
+#                                 np.shape(e)))
