@@ -107,7 +107,7 @@ class dataHandler:
     
     
     
-    return Mixdown, (Bass, Drums, Vocals, Other)
+    return Mixdown, Vocals #(Bass, Drums, Vocals, Other)
   
   #@tf.function
   def build_dataset(self,dataset, batch_size):
