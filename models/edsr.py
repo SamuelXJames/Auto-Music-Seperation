@@ -54,10 +54,10 @@ def generator_block(inputs,filters=128, n_id_block=16, n_sub_block=1):
     return x
 def generator(shape = (None,None,1)):
   inputs = Input(shape)
-  bass = generator_block(inputs)
-  drums = generator_block(inputs)
-  guitar = generator_block(inputs)
-  other = generator_block(inputs)
+  #bass = generator_block(inputs)
+  #drums = generator_block(inputs)
+  vocals = generator_block(inputs)
+  #other = generator_block(inputs)
   
-  model = Model(inputs=inputs, outputs= [bass,drums,guitar,other])
+  model = Model(inputs=inputs, outputs= vocals)
   return model
