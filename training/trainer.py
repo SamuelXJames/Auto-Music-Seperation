@@ -64,7 +64,7 @@ class Trainer:
       self.strategy = tf.distribute.OneDeviceStrategy(device="/gpu:0")
       print(device_lib.list_local_devices())
     
-    self.tpu = tpu
+    self.TPU = tpu
     self.model_name = model
     self.model = model
     self.train_path = train_path
