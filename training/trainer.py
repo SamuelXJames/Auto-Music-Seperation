@@ -98,6 +98,7 @@ class Trainer:
     
     if self.model_name == 'edsr':
       dh = EDSRdataHandler()
+      _ = dh.listFiles(self.train_path) # This is just to call dh.listfiles()
     elif self.model_name == 'cunet':
       dh = CUNETdataHandler()
       _ = dh.listFiles(self.train_path) # This is just to call dh.listfiles()
@@ -136,6 +137,10 @@ class Trainer:
     b = int(files[-1][files[-1].find('N')+1:files[-1].rfind('_')])
 
     steps_per_epoch = np.ceil((m*num_files+b)/self.batch_size)
+
+    if self.model_name == 'edsr':
+      # Needs to add num patches/image (160) to TFRecord FIle name
+      steps_per_epoch = np.ceil((160*(m*num_files+b))/self.batch_size)
     return steps_per_epoch
   
 
@@ -217,7 +222,7 @@ class Trainer:
   # plots the learning rate as a function of epochs
   def plot_lr_schedule(self):
         
-    plt.plot(np.arange(np.shape(self.lr)[0])+1,self.lr)
+    plt.plot(np.arange(np.shape(self.learning_rate)[0])+1,self.learning_rate)
     plt.xlabel('Epochs')
     plt.ylabel('Learning Rate')
     plt.title('Learning Rate Scheduler')    
