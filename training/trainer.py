@@ -165,10 +165,6 @@ class Trainer:
   
   
   def callbacks(self):
-    log_dir = os.path.join("logs", datetime.datetime.now().strftime("%m_%d_%Y-%H_%M"))
-    tb = TensorBoard(log_dir = log_dir,
-                     update_freq='epoch')
-    
    
     cp = ModelCheckpoint(self.save_path,
                          monitor='val_loss',
@@ -178,11 +174,15 @@ class Trainer:
     
     lr = LearningRateScheduler(self.lr_scheduler,
                                verbose = 1)
+    if self.TPU ==False:
+      log_dir = os.path.join("logs", datetime.datetime.now().strftime("%m_%d_%Y-%H_%M"))
+      tb = TensorBoard(log_dir = log_dir,
+                       update_freq='epoch')
+      return [tb,cp,lr]
     
-    #progress = CheckProgressCallback(freq = self.progress_freq)
-
-
-    return [tb,cp,lr]
+    else:
+      return [cp,lr]
+    
 
   # CRT Learning Rate
   def lr_function(self,params=None,lr = None):
