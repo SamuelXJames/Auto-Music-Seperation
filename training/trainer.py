@@ -11,9 +11,10 @@ import tensorflow as tf
 import numpy as np
 import os, datetime
 import matplotlib.pyplot as plt 
-from models import edsr, cunet, edsrtest
+from models import edsr, cunet, edsrtest, medsr
 from utils.CUNETdataHandler import dataHandler as CUNETdataHandler
 from utils.EDSRdataHandler import dataHandler as EDSRdataHandler
+from utils.MEDSRdataHandler import dataHandler as MEDSRdataHandler
 from utils.testedsrdatahandler import dataHandler as TestdataHandler
 from utils import files_toDataset as ftd
 from training.progressCallback import CheckProgressCallback
@@ -64,7 +65,6 @@ class Trainer:
       self.strategy = tf.distribute.OneDeviceStrategy(device="/gpu:0")
       print(device_lib.list_local_devices())
     
-    self.TPU = tpu
     self.model_name = model
     self.model = model
     self.train_path = train_path
@@ -106,6 +106,9 @@ class Trainer:
     elif self.model_name == 'test':
       dh = TestdataHandler()
     
+    elif self.model_name == 'medsr':
+      dh = MEDSRdataHandler()
+    
     
     return dh
 
@@ -139,7 +142,7 @@ class Trainer:
 
     steps_per_epoch = np.ceil((m*num_files+b)/self.batch_size)
 
-    if self.model_name == 'edsr':
+    if self.model_name == 'edsr' or 'medsr':
       # Needs to add num patches/image (160) to TFRecord FIle name
       steps_per_epoch = np.ceil((160*(m*num_files+b))/self.batch_size)
     return steps_per_epoch
@@ -155,6 +158,9 @@ class Trainer:
     
     elif model == 'test':
       model = edsrtest.generator()
+    
+    elif model == 'medsr':
+      model = medsr.generator()
 
     return model
 
