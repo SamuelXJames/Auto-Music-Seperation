@@ -46,9 +46,9 @@ def generator_block(inputs,filters=128, n_id_block=16, n_sub_block=1):
     x = Conv2D(filters=filters, kernel_size=3, strides=1, padding='same')(x)
 
     x = Add()([x_1, x])
-    x = Conv2D(filters = filters, kernel_size = 3, strides=2, padding ='same')(x)
-    for _ in range(n_sub_block):
-        x = upsample(x, filters)
+    #x = Conv2D(filters = filters, kernel_size = 3, strides=2, padding ='same')(x)
+    #for _ in range(n_sub_block):
+        #x = upsample(x, filters)
     x = Conv2D(filters=1, kernel_size=3, strides=1, padding='same')(x)
     
     return x
