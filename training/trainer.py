@@ -135,7 +135,7 @@ class Trainer:
 
   
   def get_steps_epoch(self,path):
-    if self.mode_name == 'cunet':
+    if self.model_name == 'cunet':
       files = tf.io.gfile.glob(os.path.join(path,'*.tfrec'))
       num_files = np.shape(files)[0] - 1
       m = int(files[0][files[0].find('N')+1:files[0].rfind('_')])
