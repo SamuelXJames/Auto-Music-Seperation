@@ -135,17 +135,21 @@ class Trainer:
 
   
   def get_steps_epoch(self,path):
-    files = tf.io.gfile.glob(os.path.join(path,'*.tfrec'))
-    num_files = np.shape(files)[0] - 1
-    m = int(files[0][files[0].find('N')+1:files[0].rfind('_')])
-    b = int(files[-1][files[-1].find('N')+1:files[-1].rfind('_')])
+    if self.mode_name == 'cunet':
+      files = tf.io.gfile.glob(os.path.join(path,'*.tfrec'))
+      num_files = np.shape(files)[0] - 1
+      m = int(files[0][files[0].find('N')+1:files[0].rfind('_')])
+      b = int(files[-1][files[-1].find('N')+1:files[-1].rfind('_')])
 
-    steps_per_epoch = np.ceil((m*num_files+b)/self.batch_size)
+      steps_per_epoch = np.ceil((m*num_files+b)/self.batch_size)
+      return steps_per_epoch
+    
 
-    if self.model_name == 'edsr' or 'medsr':
-      # Needs to add num patches/image (160) to TFRecord FIle name
+    if self.model_name == 'edsr':
       steps_per_epoch = np.ceil((160*(m*num_files+b))/self.batch_size)
-    return steps_per_epoch
+      return steps_per_epoch
+    
+    
   
 
   # Add all the possible models
