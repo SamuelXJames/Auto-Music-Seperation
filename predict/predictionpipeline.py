@@ -208,10 +208,10 @@ def predict(model,spectrograms):
 
 
 
-def getPrediction(filename, type, PATH = None):
+def getPrediction(model,filename, type, PATH = None):
   audio = trim_audio(filename)
   spec = convert_toSpec(audio, type)
-  prediction = predict(spec)
+  prediction = predict(model,spec)
 
   if type == 'mel':
     convert_toAudio(prediction,PATH,'mel')
