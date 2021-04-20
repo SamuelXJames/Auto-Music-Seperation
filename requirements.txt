@@ -2,3 +2,5 @@
 #check-requirements-txt
 #git+git://github.com/tarepan/rainbowgram.git
 effortless-config
+Pillow 
+pydub
