@@ -7,7 +7,7 @@ Original file is located at
     https://colab.research.google.com/drive/1F6lYqTGXhzNhWhLmddWbxbaCacQ0mcZq
 """
 
-!pip install Pillow pydub
+#!pip install Pillow pydub
 
 # A pipeline to make prediction
 
