@@ -11,7 +11,9 @@ import tensorflow as tf
 import numpy as np
 import os, datetime
 import matplotlib.pyplot as plt 
+from PIL import Image
 from models import edsr, cunet, edsrtest, medsr
+from predict import files_toDataset
 from utils.CUNETdataHandler import dataHandler as CUNETdataHandler
 from utils.EDSRdataHandler import dataHandler as EDSRdataHandler
 from utils.MEDSRdataHandler import dataHandler as MEDSRdataHandler
@@ -29,7 +31,7 @@ class Trainer:
 
   def __init__(self, 
                model = None, 
-               save_path = None,
+               save_path = 'a',
                train_path = None,
                valid_path = None,
                progress_folder = None,
@@ -37,6 +39,7 @@ class Trainer:
                progress_freq = 5,
                test_path = None, 
                weights_path = None,
+               input_shape = None,
                batch_size = 32,
                epochs = 1000,
                learning_rate_params={'cycle': 9, 
@@ -52,46 +55,62 @@ class Trainer:
                save_freq = 5,
                cache = False,
                shuffle = False,
-               tpu = False):
+               tpu = False,
+               train = True):
     
-    if tpu:
-      resolver = tf.distribute.cluster_resolver.TPUClusterResolver(tpu='')
-      tf.config.experimental_connect_to_cluster(resolver)
-      tf.tpu.experimental.initialize_tpu_system(resolver)
-      print("All devices: ", tf.config.list_logical_devices('TPU'))
-      self.strategy = tf.distribute.TPUStrategy(resolver)
+      
+    self.model_name = model # Set desired model
+    self.train = train
+    # Load the weights of the desrired model
+    if train == False:
+      self.input_shape = input_shape 
+      self.getSavedModel(weights_path)
     
     else:
-      self.strategy = tf.distribute.OneDeviceStrategy(device="/gpu:0")
-      print(device_lib.list_local_devices())
-    self.TPU = tpu
-    self.model_name = model
-    self.model = model
-    self.train_path = train_path
-    self.valid_path = valid_path
-    self.test_path = test_path
-    self.progress_save_folder = progress_save_folder
-    self.weights_path = weights_path
+      
+      # Set Work Distrubition Strategy
+      if tpu:
+        resolver = tf.distribute.cluster_resolver.TPUClusterResolver(tpu='')
+        tf.config.experimental_connect_to_cluster(resolver)
+        tf.tpu.experimental.initialize_tpu_system(resolver)
+        print("All devices: ", tf.config.list_logical_devices('TPU'))
+        self.strategy = tf.distribute.TPUStrategy(resolver)
+      
+      else:
+        self.strategy = tf.distribute.OneDeviceStrategy(device="/gpu:0")
+        #print(device_lib.list_local_devices())
+      
+      self.TPU = tpu
+      
+      # Paths to Data and Weights
+      self.train_path = train_path
+      self.valid_path = valid_path
+      self.test_path = test_path
+      self.progress_save_folder = progress_save_folder
+      self.weights_path = weights_path
+      self.save_path = save_path + '/cp-{epoch:04d}.hdf5'
 
-    self.save_freq = save_freq
-    self.batch_size = batch_size
-    self.epochs = epochs
-    self.steps_per_execution = steps_per_execution 
-    self.save_path = save_path + '/cp-{epoch:04d}.hdf5'
-    self.cache = cache
-    self.shuffle = shuffle
-    self.adam_optimizer = adam_optimizer
-    self.loss = loss
-    
-    self.learning_rate_params = learning_rate_params
-    self.dh = self.getdataHandler() # Might want to just have one dataHandler.py
-    self.learning_rate = self.lr_function(params = learning_rate_params, 
-                                          lr = learning_function)
-    
-
-    if progress_folder:
-      self.progress_dataset, self.progress_files = self.getPredData(progress_folder)
-    
+      # Training Parameters
+      self.epochs = epochs
+      self.batch_size = batch_size
+      self.adam_optimizer = adam_optimizer
+      self.loss = loss
+      self.learning_rate_params = learning_rate_params
+      self.dh = self.getdataHandler() # Might want to just have one dataHandler.py
+      self.learning_rate = self.lr_function(params = learning_rate_params, 
+                                            lr = learning_function)
+      self.steps_per_execution = steps_per_execution 
+      
+      
+      
+      # TF Dataset Parameters      
+      self.cache = cache
+      self.shuffle = shuffle
+      
+      # Monitoring Metrics
+      self.save_freq = save_freq
+      if progress_folder:
+        self.progress_dataset, self.progress_files = self.getPredData(progress_folder)    
     
     
 
@@ -122,32 +141,32 @@ class Trainer:
     valid_data = self.dh.build_dataset(valid_files,self.batch_size)
     
 
-    if self.cache:
-      train_data = train_data.cache() #Cache if space permits 
+    if self.cache: #Cache if space permits 
+      train_data = train_data.cache() 
       valid_data = valid_data.cache()
      
     
     if self.shuffle:
-      train_data = train_data.shuffle()
+      train_data = train_data.shuffle(3000)
 
     return train_data, valid_data
 
 
   
   def get_steps_epoch(self,path):
+    files = tf.io.gfile.glob(os.path.join(path,'*.tfrec'))
+    num_files = np.shape(files)[0] - 1
+    m = int(files[0][files[0].find('N')+1:files[0].rfind('_')])
+    b = int(files[-1][files[-1].find('N')+1:files[-1].rfind('_')])
+
     if self.model_name == 'cunet':
-      files = tf.io.gfile.glob(os.path.join(path,'*.tfrec'))
-      num_files = np.shape(files)[0] - 1
-      m = int(files[0][files[0].find('N')+1:files[0].rfind('_')])
-      b = int(files[-1][files[-1].find('N')+1:files[-1].rfind('_')])
-
-      steps_per_epoch = np.ceil((m*num_files+b)/self.batch_size)
-      return steps_per_epoch
+      steps_per_epoch = np.ceil((m*num_files+b)/self.batch_size)  
     
-
-    if self.model_name == 'edsr':
+    elif self.model_name == 'edsr':
       steps_per_epoch = np.ceil((160*(m*num_files+b))/self.batch_size)
-      return steps_per_epoch
+    
+    
+    return steps_per_epoch
     
     
   
@@ -158,7 +177,11 @@ class Trainer:
       model = edsr.generator()
     
     elif model == 'cunet':
-      model = cunet.cunet_model(shape = self.dh.IMG_SHAPE)
+      if self.train:
+        shape = self.dh.IMG_SHAPE
+      else:
+        shape = self.input_shape
+      model = cunet.cunet_model(shape = shape)
     
     elif model == 'test':
       model = edsrtest.generator()
@@ -168,6 +191,7 @@ class Trainer:
 
     return model
 
+  # Only used for the prediction checkpoint
   def getPredData(self,pred_folder):
     predData,files = ftd.getPredictFiles(pred_folder,extension = '*.png')
     return predData,files
@@ -250,7 +274,7 @@ class Trainer:
 
   def train(self):
     with self.strategy.scope():
-      self.model = self.getModel(self.model)
+      self.model = self.getModel(self.model_name)
       
       if self.weights_path:
         self.model.load_weights(self.weights_path)
@@ -283,9 +307,16 @@ class Trainer:
                    initial_epoch = self.get_initial_epoch())
     
                    
-    def test_model(self):
-      test_files = self.dh.listFiles(self.test_path)
-      test_data = self.dh.build_dataset(test_files,self.batch_size)
-      test_data = test_data.cache()
+  def test_model(self):
+    test_files = self.dh.listFiles(self.test_path)
+    test_data = self.dh.build_dataset(test_files,self.batch_size)
+    test_data = test_data.cache()
 
-      self.model.evaluate(test_data)
+    self.model.evaluate(test_data)
+    
+  def getSavedModel(self,weights_path):
+    self.model = self.getModel(self.model_name)
+    self.model.load_weights(weights_path)
+    
+
+    return None
